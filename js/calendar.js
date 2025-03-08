@@ -73,10 +73,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   // ローカルストレージにない場合はセッションを調べる
   if (!googleToken || !refreshToken || !expiryTime) {
     try {
-      const response = await fetch("http://localhost:3000/get-token", {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/get-token",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
       if (!response.ok) throw new Error("トークン取得に失敗しました");
 
       const data = await response.json();
@@ -107,11 +110,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     // リフレッシュトークンを使ってアクセストークンを更新
     try {
       userNameElement.textContent = "Google カレンダーと同期中...";
-      const response = await fetch("http://localhost:3000/refresh-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken }),
-      });
+      const response = await fetch(
+        "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/refresh-token",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken }),
+        }
+      );
 
       if (!response.ok) throw new Error("アクセストークンの更新に失敗しました");
 
@@ -136,7 +142,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   // ログインボタンクリック
   loginButton.addEventListener("click", () => {
     // バックエンド(ScheduleTask.mjs)でログイン処理→セッションに保存
-    window.location.href = "http://localhost:3000/auth";
+    window.location.href =
+      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/auth";
   });
 
   // ユーザーのログアウト
@@ -150,10 +157,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         localStorage.removeItem("expiryTime");
 
         // 🔹 サーバー側のセッションを削除
-        await fetch("http://localhost:3000/logout", {
-          method: "POST",
-          credentials: "include", // セッションを送信
-        });
+        await fetch(
+          "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/logout",
+          {
+            method: "POST",
+            credentials: "include", // セッションを送信
+          }
+        );
         // URLからクエリパラメータを削除
         //window.history.replaceState({}, document.title, "/");
         window.location.href = "https://accounts.google.com/logout";
@@ -202,7 +212,7 @@ async function fetchGoogleCalendarEvents(googleToken) {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/getGoogleCalendarEvents",
+      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/getGoogleCalendarEvents",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

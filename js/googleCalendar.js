@@ -21,11 +21,14 @@ export async function addEventToGoogleCalendar(eventData) {
       return;
     }
 
-    const response = await fetch("http://localhost:3000/addGoogleCalendar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event, token }),
-    });
+    const response = await fetch(
+      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/addGoogleCalendar",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event, token }),
+      }
+    );
 
     const data = await response.json();
     console.log("Google カレンダーに予定を追加:", data);

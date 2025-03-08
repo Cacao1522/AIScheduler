@@ -14,16 +14,19 @@ Button.addEventListener("click", async () => {
   console.log(taskInput);
   let result;
   try {
-    const response = await fetch("http://localhost:3000/predictTaskTime", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        taskInput: taskInput,
-        OtherSchedule: otherSchedule, //  連携できてない
-      }),
-    });
+    const response = await fetch(
+      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/predictTaskTime",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          taskInput: taskInput,
+          OtherSchedule: otherSchedule, //  連携できてない
+        }),
+      }
+    );
     if (!response.ok) {
       const errorDetail = await response.text();
       throw new Error(

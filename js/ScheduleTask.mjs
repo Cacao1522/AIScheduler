@@ -11,12 +11,15 @@ const apiKey = process.env.CHATGPT_KEY;
 const client = new OpenAI({ apiKey: apiKey });
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // app.use(cors()); // CORSを有効にする
 app.use(
   cors({
-    origin: "http://localhost:5173", // ✅ クライアントのURLを指定
+    origin: [
+      "http://localhost:5173", // ✅ クライアントのURLを指定
+      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/",
+    ],
     credentials: true, // ✅ セッション維持のため必須
   })
 );
@@ -26,7 +29,11 @@ app.use(
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // HTTPS 環境なら `true`
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // 本番環境なら true
+      httpOnly: true,
+      sameSite: "None",
+    },
   })
 );
 
@@ -138,7 +145,8 @@ const SCOPES = [
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  process.env.GOOGLE_REDIRECT_URI ||
+    "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/auth/callback"
 );
 app.get("/auth", (req, res) => {
   const authUrl = oauth2Client.generateAuthUrl({
