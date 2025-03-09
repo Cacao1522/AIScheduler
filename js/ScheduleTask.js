@@ -186,7 +186,9 @@ app.get("/auth/callback", async (req, res) => {
     //     tokens.refresh_token || ""
     //   }&expiry=${expiryTime}`
     // );
-    res.redirect("http://localhost:5173");
+    res.redirect(
+      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net"
+    );
   } catch (error) {
     console.error("❌ 認証エラー:", error);
     res.send("認証に失敗しました");
