@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "concurrently \"node --experimental-modules js/ScheduleTask.js\" \"vite preview --port=8080\"",
+    "start": "node js/ScheduleTask.js",
     "prestart": "vite build"
   },
   "devDependencies": {
@@ -19,7 +19,6 @@
     "@fullcalendar/list": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
     "ajv": "^8.17.1",
-    "concurrently": "^9.1.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",

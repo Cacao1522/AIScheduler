@@ -4,6 +4,8 @@ import OpenAI from "openai";
 import { google } from "googleapis";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config(); //.envの内容を読み込む
 
@@ -12,6 +14,7 @@ const client = new OpenAI({ apiKey: apiKey });
 
 const app = express();
 const port = process.env.PORT || 3000;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // app.use(cors()); // CORSを有効にする
 app.use(
@@ -23,7 +26,8 @@ app.use(
     credentials: true, // ✅ セッション維持のため必須
   })
 );
-app.use(express.json());
+// `dist` フォルダの静的ファイルを提供
+app.use(express.static(path.join(__dirname, "dist")));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-secret-key",
@@ -36,6 +40,11 @@ app.use(
     },
   })
 );
+
+// すべてのルートを `index.html` にリダイレクト
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 // JSONスキーマ
 const taskOutputSchema = {
