@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "concurrently \"node js/ScheduleTask.js\" \"vite preview --port=8080\"",
-    "prestart": "node --experimental-modules node_modules/.bin/vite build"
+    "start": "concurrently \"node --experimental-modules js/ScheduleTask.js\" \"vite preview --port=8080\"",
+    "prestart": "vite build"
   },
   "devDependencies": {
     "vite": "^5.4.1"
