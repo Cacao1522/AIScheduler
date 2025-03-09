@@ -8,7 +8,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "concurrently \"node js/ScheduleTask.js\" \"vite preview --port=8080\"",
-    "postinstall": "npm install",
     "prestart": "vite build"
   },
   "devDependencies": {
