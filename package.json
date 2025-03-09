@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node js/ScheduleTask.mjs",
-    "prestart": "npx vite build"
+    "prestart": "vite build"
   },
   "devDependencies": {
     "vite": "^5.4.1"
