@@ -245,6 +245,7 @@ app.post("/refresh-token", async (req, res) => {
 // ログアウト時にセッションを削除
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
+    console.log("🔑 セッション削除");
     if (err) {
       console.error("❌ セッション削除エラー:", err);
       return res.status(500).json({ error: "ログアウトに失敗しました" });
