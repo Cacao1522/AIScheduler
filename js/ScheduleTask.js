@@ -28,7 +28,7 @@ app.use(
 );
 // `dist` フォルダの静的ファイルを提供
 //app.use(express.static(path.join(__dirname, "dist")));
-app.use(express.static(path.join(__dirname, "wwwroot", "dist")));
+app.use(express.static(path.join(__dirname, "dist")));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-secret-key",
@@ -47,7 +47,7 @@ app.use(
 //   res.sendFile(path.join(__dirname, "dist", "index.html"));
 // });
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "wwwroot", "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 // JSONスキーマ
 const taskOutputSchema = {
