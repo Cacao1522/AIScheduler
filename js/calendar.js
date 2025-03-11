@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // ログインボタンクリック
   loginButton.addEventListener("click", () => {
+    console.log("🔑 ログインボタンクリック");
     // バックエンド(ScheduleTask.mjs)でログイン処理→セッションに保存
     window.location.href =
       "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/auth";
@@ -150,6 +151,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   document
     .getElementById("sign-out-button")
     .addEventListener("click", async () => {
+      console.log("🔑 ログアウトボタンクリック");
       try {
         // ローカルストレージからトークンを削除
         localStorage.removeItem("googleToken"); // ✅ Google API トークンも削除
