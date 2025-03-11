@@ -28,7 +28,7 @@ app.use(
 );
 // `dist` フォルダの静的ファイルを提供
 //app.use(express.static(path.join(__dirname, "dist")));
-app.use(express.static(path.join(__dirname, "dist")));
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-secret-key",
@@ -46,9 +46,7 @@ app.use(
 // app.get("*", (req, res) => {
 //   res.sendFile(path.join(__dirname, "dist", "index.html"));
 // });
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
+
 // JSONスキーマ
 const taskOutputSchema = {
   type: "object",
@@ -318,4 +316,9 @@ app.post("/getGoogleCalendarEvents", async (req, res) => {
     console.error("❌ Google カレンダーの予定取得エラー:", error);
     res.status(500).json({ error: error.message });
   }
+});
+
+app.use(express.static(path.join(__dirname, "dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
