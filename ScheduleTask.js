@@ -21,7 +21,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", // ✅ クライアントのURLを指定
-      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/",
+      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net",
     ],
     credentials: true, // ✅ セッション維持のため必須
   })
