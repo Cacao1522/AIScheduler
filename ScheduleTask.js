@@ -13,7 +13,7 @@ const apiKey = process.env.CHATGPT_KEY;
 const client = new OpenAI({ apiKey: apiKey });
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // app.use(cors()); // CORSを有効にする
