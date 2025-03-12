@@ -1,6 +1,7 @@
 import express from "express";
 // import session from "express-session";
-import cookieParser from "cookie-parser";
+// import cookieParser from "cookie-parser";
+const cookieParser = require("cookie-parser");
 import OpenAI from "openai";
 import { google } from "googleapis";
 import dotenv from "dotenv";
