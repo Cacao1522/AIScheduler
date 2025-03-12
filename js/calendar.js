@@ -94,6 +94,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/refresh-token",
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refreshToken: data.refreshToken }),
         }

@@ -180,26 +180,32 @@ app.get("/auth/callback", async (req, res) => {
       (tokens.expiry_date
         ? tokens.expiry_date - Date.now()
         : tokens.expires_in * 1000);
-
+    const expiryDuration = tokens.expiry_date
+      ? tokens.expiry_date - Date.now()
+      : tokens.expires_in * 1000;
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("accessToken", tokens.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-      maxAge: expiryTime,
+      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+      domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
+      maxAge: expiryDuration,
     });
 
     res.cookie("refreshToken", tokens.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
+      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+      domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
       maxAge: 60 * 60 * 24 * 30 * 1000, // 30日間
     });
 
     res.cookie("expiry", expiryTime, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-      maxAge: expiryTime,
+      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+      domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
+      maxAge: expiryDuration,
     });
     // 🔹 セッションに保存
     // req.session.accessToken = tokens.access_token;
