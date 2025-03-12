@@ -1,5 +1,6 @@
 import express from "express";
-import session from "express-session";
+// import session from "express-session";
+import cookieParser from "cookie-parser";
 import OpenAI from "openai";
 import { google } from "googleapis";
 import dotenv from "dotenv";
@@ -23,29 +24,26 @@ app.use(
       "http://localhost:5173", // ✅ クライアントのURLを指定
       "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net",
     ],
-    credentials: true, // ✅ セッション維持のため必須
+    credentials: true, // クッキーを送受信するために必要
   })
 );
 // `dist` フォルダの静的ファイルを提供
 //app.use(express.static(path.join(__dirname, "dist")));
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "your-secret-key",
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // 本番環境なら true
-      httpOnly: true,
-      sameSite: "None",
-    },
-  })
-);
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET || "your-secret-key",
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//       secure: process.env.NODE_ENV === "production", // 本番環境なら true
+//       httpOnly: true,
+//       sameSite: "None",
+//     },
+//   })
+// );
 
-// すべてのルートを `index.html` にリダイレクト
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "dist", "index.html"));
-// });
+app.use(cookieParser());
 
 // JSONスキーマ
 const taskOutputSchema = {
@@ -182,14 +180,35 @@ app.get("/auth/callback", async (req, res) => {
       (tokens.expiry_date
         ? tokens.expiry_date - Date.now()
         : tokens.expires_in * 1000);
+
+    res.cookie("accessToken", tokens.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      maxAge: expiryTime,
+    });
+
+    res.cookie("refreshToken", tokens.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      maxAge: 60 * 60 * 24 * 30 * 1000, // 30日間
+    });
+
+    res.cookie("expiry", expiryTime, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      maxAge: expiryTime,
+    });
     // 🔹 セッションに保存
-    req.session.accessToken = tokens.access_token;
-    req.session.refreshToken = tokens.refresh_token;
-    req.session.tokenExpiry =
-      Date.now() +
-      (tokens.expiry_date
-        ? tokens.expiry_date - Date.now()
-        : tokens.expires_in * 1000);
+    // req.session.accessToken = tokens.access_token;
+    // req.session.refreshToken = tokens.refresh_token;
+    // req.session.tokenExpiry =
+    //   Date.now() +
+    //   (tokens.expiry_date
+    //     ? tokens.expiry_date - Date.now()
+    //     : tokens.expires_in * 1000);
     // 🔹 トークンをフロントエンドに渡す
     // res.redirect(
     //   `http://localhost:5173?token=${tokens.access_token}&refreshToken=${
@@ -208,14 +227,14 @@ app.get("/auth/callback", async (req, res) => {
 // 🔹 フロントエンドが `access_token` を取得する API
 app.get("/get-token", (req, res) => {
   console.log("🔍 セッションの状態:", req.session);
-  if (!req.session.accessToken) {
+  if (!req.cookies.accessToken) {
     return res.status(401).json({ error: "ログインが必要です" });
   }
 
   res.json({
-    accessToken: req.session.accessToken,
-    refreshToken: req.session.refreshToken,
-    expiry: req.session.tokenExpiry,
+    accessToken: req.cookies.accessToken,
+    refreshToken: req.cookies.refreshToken,
+    expiry: req.cookies.expiry,
   });
 });
 
@@ -240,15 +259,31 @@ app.post("/refresh-token", async (req, res) => {
   }
 });
 
-// ログアウト時にセッションを削除
+// ログアウト時にクッキーを削除
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
-    console.log("🔑 セッション削除");
+    console.log("クッキー削除");
     if (err) {
-      console.error("❌ セッション削除エラー:", err);
+      console.error("クッキー削除エラー:", err);
       return res.status(500).json({ error: "ログアウトに失敗しました" });
     }
-    res.clearCookie("connect.sid"); // 🔹 セッションIDのクッキーを削除
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+    });
+
+    res.clearCookie("expiry", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+    });
     res.json({ message: "ログアウト成功" });
   });
 });
