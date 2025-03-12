@@ -226,7 +226,7 @@ app.get("/auth/callback", async (req, res) => {
 
 // 🔹 フロントエンドが `access_token` を取得する API
 app.get("/get-token", (req, res) => {
-  console.log("🔍 セッションの状態:", req.session);
+  console.log("🔍 セッションの状態:", req.cookies);
   if (!req.cookies.accessToken) {
     return res.status(401).json({ error: "ログインが必要です" });
   }
