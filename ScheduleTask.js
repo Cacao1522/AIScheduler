@@ -185,8 +185,8 @@ app.get("/auth/callback", async (req, res) => {
     const expiryDuration = tokens.expiry_date
       ? tokens.expiry_date - Date.now()
       : tokens.expires_in * 1000;
+
     const isProduction = process.env.NODE_ENV === "production";
-    console.log(isProduction);
     res.cookie("accessToken", tokens.access_token, {
       httpOnly: true,
       secure: isProduction, // 本番環境では `true`（HTTPS 必須）
@@ -267,31 +267,26 @@ app.post("/refresh-token", async (req, res) => {
 
 // ログアウト時にクッキーを削除
 app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    console.log("クッキー削除");
-    if (err) {
-      console.error("クッキー削除エラー:", err);
-      return res.status(500).json({ error: "ログアウトに失敗しました" });
-    }
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-    });
-
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-    });
-
-    res.clearCookie("expiry", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-    });
-    res.json({ message: "ログアウト成功" });
+  console.log("クッキー削除");
+  const isProduction = process.env.NODE_ENV === "production";
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "None",
   });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "None",
+  });
+
+  res.clearCookie("expiry", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "None",
+  });
+  res.json({ message: "ログアウト成功" });
 });
 
 // Google カレンダーに予定を追加
