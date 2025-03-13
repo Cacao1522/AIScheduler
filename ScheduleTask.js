@@ -1,12 +1,16 @@
 import express from "express";
-// import session from "express-session";
-import cookieParser from "cookie-parser";
+import session from "express-session";
 import OpenAI from "openai";
 import { google } from "googleapis";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import connectRedis from "connect-redis";
+import redis from "redis";
+
+const RedisStore = connectRedis(session);
+const redisClient = redis.createClient();
 
 dotenv.config(); //.envの内容を読み込む
 
@@ -43,7 +47,19 @@ app.use(
 //   })
 // );
 
-app.use(cookieParser());
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET || "your-secret-key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "None",
+    },
+  })
+);
 
 // JSONスキーマ
 const taskOutputSchema = {
@@ -175,47 +191,47 @@ app.get("/auth/callback", async (req, res) => {
     oauth2Client.setCredentials(tokens);
     console.log("✅ 取得したアクセストークン:", tokens.access_token);
     console.log("✅ 取得したリフレッシュトークン:", tokens.refresh_token);
-    const expiryTime =
-      Date.now() +
-      (tokens.expiry_date
-        ? tokens.expiry_date - Date.now()
-        : tokens.expires_in * 1000);
-    const expiryDuration = tokens.expiry_date
-      ? tokens.expiry_date - Date.now()
-      : tokens.expires_in * 1000;
-    const isProduction = process.env.NODE_ENV === "production";
-    console.log(isProduction);
-    res.cookie("accessToken", tokens.access_token, {
-      httpOnly: true,
-      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
-      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
-      domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
-      maxAge: expiryDuration,
-    });
-
-    res.cookie("refreshToken", tokens.refresh_token, {
-      httpOnly: true,
-      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
-      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
-      domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
-      maxAge: 60 * 60 * 24 * 30 * 1000, // 30日間
-    });
-
-    res.cookie("expiry", expiryTime, {
-      httpOnly: true,
-      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
-      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
-      domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
-      maxAge: expiryDuration,
-    });
-    // 🔹 セッションに保存
-    // req.session.accessToken = tokens.access_token;
-    // req.session.refreshToken = tokens.refresh_token;
-    // req.session.tokenExpiry =
+    // const expiryTime =
     //   Date.now() +
     //   (tokens.expiry_date
     //     ? tokens.expiry_date - Date.now()
     //     : tokens.expires_in * 1000);
+    // const expiryDuration = tokens.expiry_date
+    //   ? tokens.expiry_date - Date.now()
+    //   : tokens.expires_in * 1000;
+    // const isProduction = process.env.NODE_ENV === "production";
+    // console.log(isProduction);
+    // res.cookie("accessToken", tokens.access_token, {
+    //   httpOnly: true,
+    //   secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+    //   sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+    //   domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
+    //   maxAge: expiryDuration,
+    // });
+
+    // res.cookie("refreshToken", tokens.refresh_token, {
+    //   httpOnly: true,
+    //   secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+    //   sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+    //   domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
+    //   maxAge: 60 * 60 * 24 * 30 * 1000, // 30日間
+    // });
+
+    // res.cookie("expiry", expiryTime, {
+    //   httpOnly: true,
+    //   secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+    //   sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+    //   domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
+    //   maxAge: expiryDuration,
+    // });
+    //🔹 セッションに保存
+    req.session.accessToken = tokens.access_token;
+    req.session.refreshToken = tokens.refresh_token;
+    req.session.tokenExpiry =
+      Date.now() +
+      (tokens.expiry_date
+        ? tokens.expiry_date - Date.now()
+        : tokens.expires_in * 1000);
     // 🔹 トークンをフロントエンドに渡す
     // res.redirect(
     //   `http://localhost:5173?token=${tokens.access_token}&refreshToken=${
@@ -238,10 +254,15 @@ app.get("/get-token", (req, res) => {
     return res.status(401).json({ error: "ログインが必要です" });
   }
 
+  // res.json({
+  //   accessToken: req.cookies.accessToken,
+  //   refreshToken: req.cookies.refreshToken,
+  //   expiry: req.cookies.expiry,
+  // });]
   res.json({
-    accessToken: req.cookies.accessToken,
-    refreshToken: req.cookies.refreshToken,
-    expiry: req.cookies.expiry,
+    accessToken: req.session.accessToken,
+    refreshToken: req.session.refreshToken,
+    expiry: req.session.tokenExpiry,
   });
 });
 
