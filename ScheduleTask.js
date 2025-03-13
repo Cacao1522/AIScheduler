@@ -15,20 +15,17 @@ const client = new OpenAI({ apiKey: apiKey });
 
 const app = express();
 const port = process.env.PORT || 8080;
+const BASE_URL =
+  "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // app.use(cors()); // CORSを有効にする
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // ✅ クライアントのURLを指定
-      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net",
-    ],
+    origin: `${BASE_URL}`,
     credentials: true, // クッキーを送受信するために必要
   })
 );
-// `dist` フォルダの静的ファイルを提供
-//app.use(express.static(path.join(__dirname, "dist")));
 
 // app.use(
 //   session({
@@ -145,7 +142,7 @@ app.post("/predictTaskTime", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`サーバーが起動しました! http://localhost:${port}`);
+  console.log(`サーバーが起動しました! ${BASE_URL}`);
 });
 const SCOPES = [
   "https://www.googleapis.com/auth/calendar",
@@ -155,8 +152,7 @@ const SCOPES = [
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI ||
-    "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net/auth/callback"
+  process.env.GOOGLE_REDIRECT_URI || `${BASE_URL}/auth/callback`
 );
 app.get("/auth", (req, res) => {
   const authUrl = oauth2Client.generateAuthUrl({
@@ -215,9 +211,7 @@ app.get("/auth/callback", async (req, res) => {
     //   (tokens.expiry_date
     //     ? tokens.expiry_date - Date.now()
     //     : tokens.expires_in * 1000);
-    res.redirect(
-      "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net"
-    );
+    res.redirect(`${BASE_URL}`);
   } catch (error) {
     console.error("❌ 認証エラー:", error);
     res.send("認証に失敗しました");
