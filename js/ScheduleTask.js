@@ -215,12 +215,6 @@ app.get("/auth/callback", async (req, res) => {
     //   (tokens.expiry_date
     //     ? tokens.expiry_date - Date.now()
     //     : tokens.expires_in * 1000);
-    // 🔹 トークンをフロントエンドに渡す
-    // res.redirect(
-    //   `http://localhost:5173?token=${tokens.access_token}&refreshToken=${
-    //     tokens.refresh_token || ""
-    //   }&expiry=${expiryTime}`
-    // );
     res.redirect(
       "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net"
     );
@@ -272,19 +266,19 @@ app.post("/logout", (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "None",
+    sameSite: isProduction ? "None" : "Lax",
   });
 
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "None",
+    sameSite: isProduction ? "None" : "Lax",
   });
 
   res.clearCookie("expiry", {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "None",
+    sameSite: isProduction ? "None" : "Lax",
   });
   res.json({ message: "ログアウト成功" });
 });
