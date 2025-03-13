@@ -189,7 +189,6 @@ app.get("/auth/callback", async (req, res) => {
       httpOnly: true,
       secure: isProduction, // 本番環境では `true`（HTTPS 必須）
       sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
-      //domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
       maxAge: expiryDuration,
     });
 
@@ -197,7 +196,6 @@ app.get("/auth/callback", async (req, res) => {
       httpOnly: true,
       secure: isProduction, // 本番環境では `true`（HTTPS 必須）
       sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
-      // domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
       maxAge: 60 * 60 * 24 * 30 * 1000, // 30日間
     });
 
@@ -205,7 +203,6 @@ app.get("/auth/callback", async (req, res) => {
       httpOnly: true,
       secure: isProduction, // 本番環境では `true`（HTTPS 必須）
       sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
-      //domain: isProduction ? ".azurewebsites.net" : "localhost", // ドメインを環境ごとに設定
       maxAge: expiryDuration,
     });
     // 🔹 セッションに保存

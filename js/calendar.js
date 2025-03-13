@@ -184,6 +184,7 @@ export function addEventToCalendar(taskData) {
 
 // 🔹 Google カレンダーの予定を取得してカレンダーに追加
 async function fetchGoogleCalendarEvents(googleToken) {
+  console.log("トークン:", googleToken);
   if (!googleToken) {
     console.error("❌ Google トークンがありません。再ログインが必要です。");
     return;
