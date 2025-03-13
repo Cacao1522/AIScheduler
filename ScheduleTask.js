@@ -184,6 +184,7 @@ app.get("/auth/callback", async (req, res) => {
       ? tokens.expiry_date - Date.now()
       : tokens.expires_in * 1000;
     const isProduction = process.env.NODE_ENV === "production";
+    console.log(isProduction);
     res.cookie("accessToken", tokens.access_token, {
       httpOnly: true,
       secure: isProduction, // 本番環境では `true`（HTTPS 必須）
