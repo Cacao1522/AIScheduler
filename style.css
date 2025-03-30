@@ -119,6 +119,7 @@
   width: 100%;
   height: 100%;
   display: none;
+  z-index: 2000;
 }
 
 #ButtonPopupWrapper {
@@ -513,6 +514,18 @@
 }
 #modal-description, #modal-location {
   display: flex;
-  align-items: center;
-  
+  align-items: center; 
+}
+.make:disabled {
+  opacity: 0.3; /* 半透明にする */
+  cursor: not-allowed;/* カーソルを禁止マークに */
+  background-color: #304060; /* 透明ではなく元の背景色を維持 */
+  color: rgba(255, 255, 255, 0.5); /* 文字色も薄く */
+  z-index: 0;
+}
+.nightTime {
+  margin: 15px 5px 10px 20px;
+  width: 16px;  /* チェックボックスの幅を大きく */
+  height: 16px; /* チェックボックスの高さを大きく */
+  cursor: pointer;
 }

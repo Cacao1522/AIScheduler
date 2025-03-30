@@ -202,7 +202,7 @@ document.getElementById("addTaskButton").addEventListener("click", () => {
   newTaskForm.classList.add("task-form");
   // **区切り線**
   const separator = document.createElement("hr");
-  separator.classList.add("task-separator");
+  separator.classList.add("border");
 
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("inputContainer");
@@ -277,6 +277,7 @@ document.getElementById("addTaskButton").addEventListener("click", () => {
   const locationInput = document.createElement("textarea");
   locationInput.classList.add("location");
   locationInput.placeholder = "タスクをする場所を入力";
+
   // **ポップアップをタスクに追加**
   locationPopupInside.appendChild(locationClose);
   locationPopupInside.appendChild(locationInput);
@@ -289,17 +290,31 @@ document.getElementById("addTaskButton").addEventListener("click", () => {
   optionContainer.appendChild(taskTime);
   optionContainer.appendChild(taskColor);
   optionContainer.appendChild(taskLocation);
-  taskLocation.addEventListener("click", () => {
+
+  // クリックでポップアップを表示
+  locationIcon.addEventListener("click", () => {
     locationPopupWrapper.style.visibility = "visible";
     locationPopupWrapper.style.display = "block";
+  });
+
+  // 「×」ボタンをクリックしたときにポップアップを閉じる
+  locationClose.addEventListener("click", () => {
+    locationPopupWrapper.style.visibility = "hidden";
+    locationPopupWrapper.style.display = "none";
+  });
+
+  // ポップアップの外側をクリックしたときに閉じる
+  locationPopupWrapper.addEventListener("click", (e) => {
+    if (e.target === locationPopupWrapper) {
+      locationPopupWrapper.style.visibility = "hidden";
+      locationPopupWrapper.style.display = "none";
+    }
   });
   // **閉じるボタン**
   locationClose.addEventListener("click", () => {
     console.log("閉じるボタンが押された");
-    setTimeout(() => {
-      locationPopupWrapper.style.visibility = "hidden";
-      locationPopupWrapper.style.display = "none";
-    }, 50); // 50ms遅延
+
+    locationPopupWrapper.style.visibility = "hidden";
   });
 
   // **削除ボタン**
