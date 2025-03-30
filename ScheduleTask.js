@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import OpenAI from "openai";
 import { google } from "googleapis";
 import dotenv from "dotenv";
+import fetch from "node-fetch";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,8 +15,8 @@ const apiKey = process.env.CHATGPT_KEY;
 const client = new OpenAI({ apiKey: apiKey });
 
 const app = express();
-const port = process.env.PORT || 8080;
-const BASE_URL =
+const port = process.env.PORT || 3000; //8080
+const BASE_URL = //"http://localhost:5173";
   "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -53,23 +54,33 @@ const taskOutputSchema = {
       items: {
         type: "object",
         properties: {
-          year: {
+          // year: {
+          //   type: "integer",
+          // },
+          // month: {
+          //   type: "integer",
+          // },
+          // day: {
+          //   type: "integer",
+          // },
+          // StartMinutes: {
+          //   type: "integer",
+          // },
+          // EndMinutes: {
+          //   type: "integer",
+          // },
+          id: {
             type: "integer",
           },
-          month: {
-            type: "integer",
+          start: {
+            type: "string", // 開始時間（ISO 8601）
           },
-          day: {
-            type: "integer",
-          },
-          StartMinutes: {
-            type: "integer",
-          },
-          EndMinutes: {
-            type: "integer",
+          dur: {
+            type: "integer", // 作業時間（分）
           },
         },
-        required: ["year", "month", "day", "StartMinutes", "EndMinutes"],
+        required: ["id", "start", "dur"],
+        //required: ["year", "month", "day", "StartMinutes", "EndMinutes"],
         additionalProperties: false,
       },
     },
@@ -80,12 +91,64 @@ const taskOutputSchema = {
 
 const predictTaskTime = async (taskInput, OtherSchedule) => {
   //スケジュールがいくつあるか分からないので、map関数を使って文字列に変換
-  const scheduleString = OtherSchedule.schedule
-    .map((item) => {
-      return `${item.year}/${item.month}/${item.day} ${item.startTime} - ${item.endTime}`;
-    })
-    .join(", ");
+  // 🔹 タスクの最も遅い期限を取得
+  // const latestDeadline = taskInput.reduce((latest, task) => {
+  //   return task.deadline > latest ? task.deadline : latest;
+  // }, new Date());
+  const latestDeadline = taskInput.tasks
+    .map((task) => new Date(task.deadline)) // 文字列なら Date に変換
+    .reduce(
+      (latest, deadline) => (deadline > latest ? deadline : latest),
+      new Date(0)
+    );
+  console.log("最も遅い期限:", latestDeadline);
+  const now = new Date();
+  const jstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000); // 日本時間に変換
+  // 🔹 指定範囲内の予定だけを抽出
+  const filteredEvents = OtherSchedule.filter((event) => {
+    return (
+      new Date(event.start) >= now && new Date(event.end) <= latestDeadline
+    );
+  });
+  console.log("now:", jstNow);
+  // const scheduleString = OtherSchedule.schedule
+  //   .map((item) => {
+  //     return `${item.year}/${item.month}/${item.day} ${item.startTime} - ${item.endTime}`;
+  //   })
+  //   .join(", ");
+  // 🔹 スケジュールデータを文字列化
+  const scheduleString = filteredEvents
+    .map((event) => {
+      const jstStart = new Date(
+        new Date(event.start).getTime() + 9 * 60 * 60 * 1000
+      );
+      const jstEnd = new Date(
+        new Date(event.end).getTime() + 9 * 60 * 60 * 1000
+      );
 
+      const startStr = jstStart
+        .toISOString()
+        .replace("T", " ")
+        .substring(0, 16); // YYYY-MM-DD HH:mm
+      const endStr = jstEnd.toISOString().replace("T", " ").substring(0, 16); // YYYY-MM-DD HH:mm
+
+      return `${event.title}:${startStr} - ${endStr}`;
+    })
+    .join("\n");
+  console.log("既存のスケジュール");
+  console.log(scheduleString);
+  const taskDetails = taskInput.tasks
+    .map((task, index) => {
+      const deadlineJST = new Date(task.deadline).toLocaleString("ja-JP", {
+        timeZone: "Asia/Tokyo",
+      });
+      return `id:${index},title:${task.title || ""},desc:${
+        task.description || ""
+      },demand:${task.demand || ""},ddl:${deadlineJST},dur(minutes):${
+        task.taskDuration
+      },loc:${task.taskLocation || ""}`;
+    })
+    .join("\n");
   //OpenAI APIの呼び出し
   const completion = await client.beta.chat.completions.parse({
     model: "gpt-4o-mini",
@@ -93,17 +156,18 @@ const predictTaskTime = async (taskInput, OtherSchedule) => {
       {
         role: "system",
         content:
-          "You are a helpful assistant. Allocate the given task without overlapping with the existing schedule.",
+          //"You are a helpful assistant. Allocate the given task without overlapping with the existing schedule.",
+          "あなたはスケジュールを整理し、適切な時間にタスクを割り当てるアシスタントです。指定されたタスクを、既存のスケジュールを考慮しながら、効率的に配置してください。",
       },
       {
         role: "user",
-        content: `This task:${taskInput.title}, ${taskInput.description} is expected to take about ${taskInput.taskDuration} minutes. When should I start and how many minutes should I work?
-        Do not schedule tasks between 0 mimutes and ${taskInput.noTaskUntilHour}mimutes.
-        If a ${taskInput.taskDuration} minutes is more than 240 minutes, please split it and create break times in between.
-        Please ensure the total of TaskDuration is ${taskInput.taskDuration}.
-        Ensure the task does not overlap with these scheduled plans :${scheduleString}.
-        Please output the start time in minutes (e.g., for 12:00, output 720).
-        this period is from today's date:${taskInput.year}/${taskInput.month}/${taskInput.day} to the deadline:${taskInput.deadline.year}/${taskInput.deadline.month}/${taskInput.deadline.day}.`,
+        // content: `This task:${taskInput.title}, ${taskInput.description} is expected to take about ${taskInput.taskDuration} minutes. When should I start and how many minutes should I work?
+        // Do not schedule tasks between 0 mimutes and ${taskInput.noTaskUntilHour}mimutes.
+        // If a ${taskInput.taskDuration} minutes is more than 240 minutes, please split it and create break times in between.
+        // Please ensure the total of TaskDuration is ${taskInput.taskDuration}.
+        // Ensure the task does not overlap with these scheduled plans :${scheduleString}.
+        // Please output the start time in minutes (e.g., for 12:00, output 720).
+        // this period is from today's date:${taskInput.year}/${taskInput.month}/${taskInput.day} to the deadline:${taskInput.deadline.year}/${taskInput.deadline.month}/${taskInput.deadline.day}.`,
         //旧案
         // content: `
         //   This task:${taskInput.title}, ${taskInput.description} is expected to take about ${taskInput.taskDuration} minutes.
@@ -111,6 +175,29 @@ const predictTaskTime = async (taskInput, OtherSchedule) => {
         //   Ensure the task does not overlap with these scheduled plans :${scheduleString}.
         //   Please output the start time in minutes from midnight (e.g., for 12:00, output 720).
         //   Make sure to find time slots that are free.`,
+        content: `以下のタスクを、期限内に適切な時間に割り当ててください。
+
+        【タスク一覧】
+        ${taskDetails}
+
+        【条件】  
+        - 既存のスケジュールと重ならないようにする  
+        - 1回の作業時間が240分を超える場合は分割し、適切に休憩を挟む   
+        - タスクは現在時刻(${jstNow.toISOString()})以降に開始する
+        ${
+          taskInput.nightTime
+            ? `- 深夜 (${taskInput.nightStart} - ${taskInput.nightEnd}) は作業しない`
+            : ""
+        }
+
+        【既存のスケジュール】
+        ${scheduleString}
+
+        【出力形式】
+        - タスクごとに以下のJSON形式
+        - "id":入力値を使用
+        - "start":YYYY-MM-DDTHH:mm の形式(ISO 8601)
+        - "dur":タスクの所要時間（分）`,
       },
     ],
     // レスポンスの形式の指定
@@ -123,6 +210,27 @@ const predictTaskTime = async (taskInput, OtherSchedule) => {
       },
     },
   });
+  console.log(`【タスク一覧】
+        ${taskDetails}
+
+        【条件】  
+        - 既存のスケジュールと重ならないようにする  
+        - 1回の作業時間が240分を超える場合は分割し、適切に休憩を挟む   
+        - タスクは現在時刻(${jstNow.toISOString()})以降に開始する
+        ${
+          taskInput.nightTime
+            ? `- 深夜 (${taskInput.nightStart} - ${taskInput.nightEnd}) は作業しない`
+            : ""
+        }
+
+        【既存のスケジュール】
+        ${scheduleString}
+
+        【出力形式】
+        - タスクごとに以下のJSON形式
+        - "id":入力値を使用
+        - "start":YYYY-MM-DDTHH:mm の形式(ISO 8601)
+        - "dur":タスクの所要時間（分）`);
   console.log("AIの回答");
   console.log(completion.choices[0].message.parsed);
   return completion.choices[0].message.parsed;
@@ -203,14 +311,7 @@ app.get("/auth/callback", async (req, res) => {
       sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
       maxAge: expiryDuration,
     });
-    // 🔹 セッションに保存
-    // req.session.accessToken = tokens.access_token;
-    // req.session.refreshToken = tokens.refresh_token;
-    // req.session.tokenExpiry =
-    //   Date.now() +
-    //   (tokens.expiry_date
-    //     ? tokens.expiry_date - Date.now()
-    //     : tokens.expires_in * 1000);
+
     res.redirect(`${BASE_URL}`);
   } catch (error) {
     console.error("❌ 認証エラー:", error);
@@ -218,38 +319,58 @@ app.get("/auth/callback", async (req, res) => {
   }
 });
 
-// 🔹 フロントエンドが `access_token` を取得する API
-app.get("/get-token", (req, res) => {
+// `access_token` が有効かどうかチェック
+// リフレッシュトークンでアクセストークンを更新
+app.get("/get-token", async (req, res) => {
   console.log("🔍 セッションの状態:", req.cookies.accessToken);
-  if (!req.cookies.accessToken) {
-    return res.status(401).json({ error: "ログインが必要です" });
+
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.refreshToken;
+  const expiry = req.cookies.expiry ? parseInt(req.cookies.expiry, 10) : 0;
+  const now = Date.now();
+
+  if (accessToken && now < expiry) {
+    // ✅ トークンが有効
+    return res.json({ isValid: true });
   }
 
-  res.json({
-    accessToken: req.cookies.accessToken,
-    refreshToken: req.cookies.refreshToken,
-    expiry: req.cookies.expiry,
-  });
-});
-
-// 🔹 `refresh_token` を使って `access_token` を更新する API
-app.post("/refresh-token", async (req, res) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken)
-    return res.status(400).json({ error: "リフレッシュトークンがありません" });
+  if (!accessToken && !refreshToken) {
+    // ❌ リフレッシュトークンがない → ログインが必要
+    return res.json({ isValid: false, error: "リフレッシュトークンなし" });
+  }
 
   try {
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const { credentials } = await oauth2Client.refreshAccessToken();
 
     console.log("🔄 新しいアクセストークン:", credentials.access_token);
-    res.json({
-      accessToken: credentials.access_token,
-      expiry: credentials.expiry_date,
+
+    const expiryTime =
+      Date.now() +
+      (credentials.expiry_date
+        ? credentials.expiry_date - Date.now()
+        : credentials.expires_in * 1000);
+    const expiryDuration = credentials.expiry_date
+      ? credentials.expiry_date - Date.now()
+      : credentials.expires_in * 1000;
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("accessToken", credentials.access_token, {
+      httpOnly: true,
+      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+      maxAge: expiryDuration,
     });
+    res.cookie("expiry", expiryTime, {
+      httpOnly: true,
+      secure: isProduction, // 本番環境では `true`（HTTPS 必須）
+      sameSite: isProduction ? "None" : "Lax", // 本番環境では `None`、開発では `Lax`
+      maxAge: expiryDuration,
+    });
+    console.log("✅ アクセストークンの更新に成功");
+    return res.json({ isValid: true }); // 🔹 トークンが更新されたので有効
   } catch (error) {
     console.error("❌ トークンリフレッシュエラー:", error);
-    res.status(500).json({ error: "トークンの更新に失敗しました" });
+    return res.json({ isValid: false, error: "アクセストークンの更新に失敗" });
   }
 });
 
@@ -279,7 +400,8 @@ app.post("/logout", (req, res) => {
 
 // Google カレンダーに予定を追加
 app.post("/addGoogleCalendar", async (req, res) => {
-  const { token, event } = req.body;
+  const token = req.cookies.accessToken;
+  const { event } = req.body;
   if (!token) {
     return res.status(400).json({ error: "アクセストークンがありません" });
   }
@@ -309,8 +431,8 @@ app.post("/addGoogleCalendar", async (req, res) => {
   }
 });
 
-app.post("/getGoogleCalendarEvents", async (req, res) => {
-  const { token } = req.body;
+app.get("/getGoogleCalendarEvents", async (req, res) => {
+  const token = req.cookies.accessToken;
 
   if (!token) {
     return res.status(400).json({ error: "アクセストークンがありません" });
@@ -326,18 +448,54 @@ app.post("/getGoogleCalendarEvents", async (req, res) => {
     const nextYear = new Date();
     nextYear.setFullYear(nextYear.getFullYear() + 1); // 1年後
 
+    // 既存の予定を取得
     const response = await calendar.events.list({
       calendarId: "primary",
       timeMin: pastSixMonth.toISOString(),
       timeMax: nextYear.toISOString(),
-      maxResults: 100,
+      maxResults: 150,
       singleEvents: true,
       orderBy: "startTime",
     });
 
-    res.json({ events: response.data.items }); // 取得した予定をフロントエンドに返す
+    // 祝日の日付を取得
+    const response2 = await calendar.events.list({
+      calendarId: "ja.japanese#holiday@group.v.calendar.google.com",
+      timeMin: pastSixMonth.toISOString(),
+      timeMax: nextYear.toISOString(),
+      singleEvents: true,
+      orderBy: "startTime",
+    });
+    const holidayDates = response2.data.items.map((event) => event.start.date);
+
+    res.json({ events: response.data.items, holidays: holidayDates }); // 取得した予定をフロントエンドに返す
   } catch (error) {
     console.error("❌ Google カレンダーの予定取得エラー:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+// 祝日情報を取得
+app.get("/getHolidays", async (req, res) => {
+  try {
+    const API_KEY = process.env.GOOGLE_CALENDAR_KEY;
+    if (!API_KEY) {
+      throw new Error("APIキーが設定されていません");
+    }
+    const url = `https://www.googleapis.com/calendar/v3/calendars/ja.japanese%40holiday@group.v.calendar.google.com/events?key=${API_KEY}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Google APIエラー: ${response.statusText}`);
+    }
+    const data = await response.json();
+
+    if (data.items) {
+      const holidays = data.items.map((event) => event.start.date);
+      return res.json({ holidays });
+    }
+
+    res.status(500).json({ error: "祝日情報が取得できませんでした" });
+  } catch (error) {
+    console.error("❌ 祝日取得エラー:", error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>AIスケジューラー</title>
@@ -11,28 +12,38 @@
   <body id="all">
     <div id="buttonContainer">
       <button id="clickBtn">タスク追加ボタン</button>
-      <span id="userName"></span>
+      <button id="loginButton">Googleカレンダーと連携（ログイン）</button>
+      <button id="sign-out-button">ログアウト</button>
     </div>
     <div id="popupWrapper">
       <div id="popupInside">
-        <div id="close">x</div>
-        <div id="inputContainer">
+        <div id="close" class="close">x</div>
+        <div id="inputContainer" class="inputContainer">
           <input
             type="text"
             id="taskTitle"
-            placeholder="タスクのタイトルを入力"
+            class="taskTitle"
+            placeholder="タスクのタイトルを入力 *"
+            required
           />
           <textarea
             type="textarea"
             id="taskDiscription"
+            class="taskDiscription"
             placeholder="タスクの詳細を入力"
           ></textarea>
+          <textarea
+            type="textarea"
+            id="taskDemand"
+            class="taskDemand"
+            placeholder="タスクの要望を入力"
+          ></textarea>
         </div>
-        <div id="taskDateDiscription">タスクの期限を入力</div>
-        <div id="optionContainer">
-          <input type="date" id="taskDate" />
-          <input type="text" id="taskTime" placeholder="タスクの時間を入力" />
-          <div id="taskColor">
+        <div id="taskDateDiscription" class="taskDateDiscription">タスクの期限を入力 *</div>
+        <div id="optionContainer" class="optionContainer">
+          <input type="datetime-local" id="taskDate" class="taskDate" required/>
+          <input type="number" id="taskTime" class="taskTime" placeholder="所要時間(分)を入力 *" required min="1"/>
+          <div id="taskColor" class="taskColor">
             <div id="colorPopupWrapper">
               <div id="colorPopupInside">
                 <div id="circleContainer">
@@ -44,9 +55,9 @@
                       data-color="blue"
                     ></div>
                     <div
-                      id="circleYellow"
+                      id="circleOrange"
                       class="circles"
-                      data-color="yellow"
+                      data-color="orange"
                     ></div>
                     <div
                       id="circleGreen"
@@ -54,36 +65,36 @@
                       data-color="green"
                     ></div>
                     <div
-                      id="circleOrange"
-                      class="circles"
-                      data-color="orange"
-                    ></div>
-                  </div>
-                  <div id="circleLowerLow">
-                    <div
                       id="circlePurple"
                       class="circles"
                       data-color="purple"
-                    ></div>
+                    ></div>  
+                  </div>
+                  <div id="circleLowerLow">
                     <div
                       id="circlePink"
                       class="circles"
                       data-color="pink"
                     ></div>
                     <div
-                      id="circleBrown"
-                      class="circles"
-                      data-color="brown"
-                    ></div>
-                    <div
                       id="circleCyan"
                       class="circles"
                       data-color="cyan"
+                    ></div>             
+                    <div
+                      id="circleYellow"
+                      class="circles"
+                      data-color="yellow"
                     ></div>
                     <div
-                      id="circleMagenta"
+                      id="circleLightGreen"
                       class="circles"
-                      data-color="magenta"
+                      data-color="lightgreen"
+                    ></div>
+                    <div
+                      id="circleGray"
+                      class="circles"
+                      data-color="gray"
                     ></div>
                   </div>
                 </div>
@@ -91,19 +102,28 @@
               </div>
             </div>
           </div>
-          <div id="taskLocation">
-            <div id="locationPopupWrapper">
-              <div id="locationPopupInside">
-                <div id="locationClose">x</div>
+          <div id="taskLocation" class="taskLocation">
+            <div id="locationPopupWrapper" class="locationPopupWrapper">
+              <div id="locationPopupInside" class="locationPopupInside">
+                <div id="locationClose" class="locationClose">x</div>
                 <textarea
                   type="text"
                   id="location"
+                  class="location"
                   placeholder="タスクをする場所を入力"
                 ></textarea>
               </div>
             </div>
             <img src="public/img/場所のアイコン.jpg" alt="場所のアイコン" />
           </div>
+        </div>
+        <div id="taskContainer" class="inputContainer"></div>
+        <input type="checkbox" id="nightTime" class="nightTime" />
+        深夜の<input type="time" id="nightStart" class="nightStart" value="00:00"/>～
+        <input type="time" id="nightEnd" class="nightEnd" value="06:00"/>は作業しない
+        <div id =addMake>
+        <button id="addTaskButton" class="addTaskButton"><span class="material-icons">add</span> タスクを追加</button>
+        <button id="Button" class="make">スケジュールを作成</button>
         </div>
         <div id="ButtonContainer">
           <div id="ButtonPopupWrapper">
@@ -115,30 +135,31 @@
               </div>
             </div>
           </div>
-          <button id="Button">タスクを追加</button>
+          
         </div>
       </div>
     </div>
     <script type="module" src="js/popup.js"></script>
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/ArrangeSchedule.js"></script>
-  </body>
-  <body>
+
     <div id="app"></div>
     <script type="module" src="js/calendar.js"></script>
-    <button id="loginButton">ログインして予定を表示</button>
-    <button id="sign-out-button">サインアウト</button>
+    
     <div id="calendar-container">
       <div id="calendar-day"></div>
       <div id="calendar-month"></div>   
     </div>
-
-    <div id="event-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid black; z-index: 1000;">
-    <h2 id="modal-title"></h2>
-    <p id="modal-start"></p>
-    <p id="modal-end"></p>
-    <button id="modal-close">閉じる</button>
-  </div>
+    <div id="modalPopupWrapper">
+      <div id="event-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid black; z-index: 1000;">
+      <h2 id="modal-title"></h2>
+      <p id="modal-start"></p>
+      <p id="modal-end"></p>
+      <p id="modal-description"></p>
+      <p id="modal-location"></p>
+      <div id="modal-close" class="close">x</div>
+      </div>
+    </div>
       </body>
 
 </html>

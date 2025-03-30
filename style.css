@@ -1,4 +1,6 @@
-#clickBtn {
+/* #clickBtn {
+  flex-grow: 1; 
+  text-align: center;
   display: block;
   margin: 20px auto;
   background-color: #304060;
@@ -8,9 +10,62 @@
   width: 300px;
   height: 70px;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: 22px;
+} */
+#clickBtn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #304060;
+  color: white;
+  border: 0;
+  padding: 6px 10px;
+  width: 300px;
+  height: 70px;
+  border-radius: 10px;
+  font-size: 22px;
 }
-
+#clickBtn:hover {
+  background-color: #405070;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+/* #loginButton {
+  display: block;
+  margin: 20px auto;
+  background-color: #2a3b99;
+  color: white;
+  border: 0;
+  padding: 6px 10px;
+  width: 340px;
+  height: 70px;
+  border-radius: 10px;
+  font-size: 18px;
+} */
+#loginButton, #sign-out-button {
+  background-color: transparent; /* 背景なし */
+  color: #2a3b99; /* 文字色 */
+  border: 2px solid #2a3b99; /* 枠線を追加 */
+  padding: 10px 15px;
+  width: 315px;
+  height: 50px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+#loginButton:hover, #sign-out-button:hover {
+  background-color: #2a3b99; /* 枠と同じ色の背景 */
+  color: white; /* 文字を白に */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+#loginButton {
+  margin-left: auto; /* 右端に配置 */
+}
+#sign-out-button {
+  margin: 0 20px;
+  width: 200px;
+}
 #buttonContainer {
   /* align-items: center;
   justify-content: center; */
@@ -18,8 +73,8 @@
   align-items: center;
   justify-content: space-between; /* ボタンとユーザー名を左右に配置 */
   width: 100%; /* 親コンテナの幅を最大に */
-  max-width: 500px; /* ボタンのサイズに合わせる */
-  margin: 0 auto; /* 中央配置 */
+  /* max-width: 500px; ボタンのサイズに合わせる */
+  margin: 20px auto; /* 中央配置 */
   padding: 10px;
 }
 
@@ -36,12 +91,14 @@
   top: 0;
   left: 0;
   width: 100%;
+  /* max-height: 800px; */
   height: 100%;
   display: none;
   align-items: center;
   /* display: flex; */
   justify-content: center;
   z-index: 2000;
+  overflow-y: auto;
 }
 
 #colorPopupWrapper {
@@ -54,7 +111,7 @@
   display: none;
 }
 
-#locationPopupWrapper {
+.locationPopupWrapper {
   background-color: rgba(0, 0, 0, 0.5);
   position: fixed;
   top: 0;
@@ -74,10 +131,20 @@
   display: none;
 }
 
+/* #modalPopupWrapper {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+} */
+
 #popupInside {
   width: 100%;
-  height: 550px;
-  max-width: 400px;
+  /* height: 550px; */
+  max-width: 450px;
 
   background-color: white; /* 不透明な背景色 */
   margin: 10% auto;
@@ -102,7 +169,7 @@
   border-radius: 10px;
 }
 
-#locationPopupInside {
+.locationPopupInside {
   width: 100%;
   height: 240px;
   max-width: 400px;
@@ -135,7 +202,7 @@
   flex-direction: column; /* 縦方向に配置 */
   align-items: center; /* 水平方向に中央揃え */
   justify-content: space-between; /* 垂直方向に中央揃え */
-  height: 100px; /* 高さを指定（必要に応じて調整） */
+  height: 10px; /* 高さを指定（必要に応じて調整） */
 }
 
 .title {
@@ -149,19 +216,20 @@
 }
 
 .dateContainer {
-  width: 50%;
+  /* width: 50%;*/
   display: flex;
-  justify-content: space-between; /* 要素間のスペースを均等に分配 */
+  justify-content: space-between; /*要素間のスペースを均等に分配 */
+  text-align: center;
 }
 
 .timeContainer {
-  width: 50%;
-  display: flex;
+  /* width: 50%; */
+  /* display: flex; */
   justify-content: space-between; /* 要素間のスペースを均等に分配 */
 }
 
 .kara {
-  display: flex; /* フレックスボックスを使用 */
+  /* display: flex; フレックスボックスを使用 */
   justify-content: center; /* 水平方向に中央揃え */
   align-items: center; /* 垂直方向に中央揃え */
 }
@@ -180,37 +248,41 @@
   margin-top: 20px; /* 上部のマージンを設定（必要に応じて） */
 }
 
-#location {
+.location {
   width: 80%;
   height: 60%;
 }
 
-#close {
+.close {
   position: absolute;
-  top: 0;
-  right: 5px;
+  top: -8px;
+  right: 8px;
   cursor: pointer;
+  font-size: 35px;
 }
 
 #colorClose {
   position: absolute;
-  top: 0;
-  right: 5px;
+  top: -8px;
+  right: 8px;
   cursor: pointer;
+  font-size: 35px;
 }
 
-#locationClose {
+.locationClose {
   position: absolute;
-  top: 0;
-  right: 5px;
+  top: -8px;
+  right: 8px;
   cursor: pointer;
+  font-size: 35px;
 }
 
 #ButtonClose {
   position: absolute;
-  top: 0;
-  right: 5px;
+  top: -8px;
+  right: 8px;
   cursor: pointer;
+  font-size: 35px;
 }
 
 #inputContainer {
@@ -218,57 +290,64 @@
   height: 75%;
 }
 
-#taskTitle {
+.taskTitle {
   width: 90%;
   margin: 10px;
 }
 
-#inputContainer {
+.inputContainer {
   text-align: center;
   height: 80%;
 }
 
-#taskDiscription {
+.taskDiscription {
   height: 85%;
   width: 90%;
   margin-top: 10px;
 }
 
-#taskDateDiscription {
+.taskDemand {
+  height: 85%;
+  width: 90%;
+  margin-top: 10px;
+}
+
+.taskDateDiscription {
   display: inline;
   margin-left: 20px;
   color: gray;
   font-size: 11px;
 }
 
-#taskTime {
+.taskTime {
+  margin-left: 20px;
+  width: 40%;
+}
+
+.taskDate {
   margin-left: 20px;
 }
 
-#taskDate {
-  margin-left: 20px;
-}
-
-#taskColor {
-  width: 20px;
-  height: 20px;
+.taskColor {
+  width: 28px;
+  height: 28px;
   background-color: blue;
   border-radius: 50%;
   margin-left: 20px;
   margin-top: 10px;
 }
 
-#taskLocation img {
-  width: 20px;
-  height: 20px;
+.taskLocation img {
+  width: 30px;
+  height: 30px;
   margin: 10px;
 }
 
-#optionContainer {
+.optionContainer {
   display: flex;
 }
 
-#Button {
+.Button {
   margin: 10px 20px;
 }
 
@@ -300,7 +379,7 @@
 }
 
 #circleYellow {
-  background-color: yellow;
+  background-color: #FBD75B;
 }
 
 #circleGreen {
@@ -316,19 +395,19 @@
 }
 
 #circlePink {
-  background-color: pink;
+  background-color: salmon;
 }
 
-#circleBrown {
-  background-color: brown;
+#circleGray {
+  background-color: gray;
 }
 
 #circleCyan {
   background-color: cyan;
 }
 
-#circleMagenta {
-  background-color: magenta;
+#circleLightGreen {
+  background-color: lightgreen;
 }
 
 
@@ -337,12 +416,103 @@
   justify-content: space-between; /* カレンダーの間にスペースを入れる */
   gap: 20px; /* カレンダーの間のギャップ */
   z-index: 1000;
+  padding: 0 60px; 
 }
 
 /* カレンダーのサイズを調整 */
 #calendar-day {
-  width: 40%; /* 各カレンダーの幅を調整 */
+  width: 35%; /* 各カレンダーの幅を調整 */
 }
 #calendar-month{
-  width: 50%;
+  width: 55%;
+}
+
+.task-form {
+  text-align: left; /* テキストやインライン要素の左揃え */
+}
+.task-separator {
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  margin: 10px 0;
+}
+.delete-task {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto; /* 上下 10px の余白を作りつつ中央揃え */
+  background-color: transparent; /* 背景なし */
+  color: red; /* 文字色 */
+  border: 2px solid red; /* 枠線を追加 */
+  width: 150px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+} 
+.delete-task i {
+  font-size: 20px; /* アイコンサイズ */
+  color: red; /* アイコンの色 */
+  vertical-align: middle; /* テキストとアイコンの高さを揃える */
+  transition: color 0.2s;
+}
+.delete-task:hover {
+  background-color: red;
+  color: white;
+}
+.delete-task:hover i{
+  color: white;
+}
+.addTaskButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto;
+  background-color: #475bd2;
+  color: white;
+  border: 0;
+  padding: 6px 10px;
+  width: 200px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.addTaskButton:hover {
+  background-color: #3749a6; /* 少し暗い青に変更 */
+}
+#addMake {
+  display: flex;
+  justify-content: space-between; /* 両端に配置 */
+  align-items: center; /* ボタンを縦方向中央揃え */
+  width: 100%; /* 親コンテナの幅を最大に */
+}
+.make {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto;
+  background-color: #304060;
+  color: white;
+  border: 0;
+  padding: 6px 10px;
+  width: 200px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.make:hover {
+  background-color: #405070;
+}
+#modal-description, #modal-location {
+  display: flex;
+  align-items: center;
+  
 }
