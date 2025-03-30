@@ -256,11 +256,9 @@ document.getElementById("addTaskButton").addEventListener("click", () => {
   // **場所**
   const taskLocation = document.createElement("div");
   taskLocation.classList.add("taskLocation");
-  const locationIcon = document.createElement("div");
-  locationIcon.innerHTML =
-    '<img src="public/img/場所のアイコン.jpg" alt="場所のアイコン">';
-  locationIcon.src = "場所のアイコン.jpg";
-  locationIcon.alt = "場所のアイコン";
+  const locationIcon = document.createElement("span");
+  locationIcon.classList.add("material-icons", "locIcon");
+  locationIcon.textContent = "location_on";
   taskLocation.appendChild(locationIcon);
   // **場所の入力ポップアップ**
   const locationPopupWrapper = document.createElement("div");

@@ -322,7 +322,7 @@
 
 .taskTime {
   margin-left: 20px;
-  width: 40%;
+  width: 30%;
 }
 
 .taskDate {
@@ -528,4 +528,10 @@
   width: 16px;  /* チェックボックスの幅を大きく */
   height: 16px; /* チェックボックスの高さを大きく */
   cursor: pointer;
+}
+.locIcon {
+  width: 30px;
+  height: 30px;
+  margin: 10px 0 10px 20px;
+  transform: scale(1.5);
 }
