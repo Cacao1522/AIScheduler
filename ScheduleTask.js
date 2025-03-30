@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import OpenAI from "openai";
 import { google } from "googleapis";
 import dotenv from "dotenv";
-import fetch from "node-fetch";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
