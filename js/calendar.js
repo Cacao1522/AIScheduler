@@ -60,6 +60,7 @@ var calendarDay = new Calendar(calendarDayEl, {
   initialView: "timeGridDay",
   allDaySlot: false, // 終日スロットを非表示
   nowIndicator: true,
+  dayMaxEventRows: true,
   //height: "auto", // 高さを自動調整
   headerToolbar: {
     start: calendarDisplay, // 月・週表示
@@ -90,6 +91,7 @@ var calendarDay = new Calendar(calendarDayEl, {
 var calendarMonth = new Calendar(calendarMonthEl, {
   plugins: [dayGridPlugin, InteractionPlugin],
   initialView: "dayGridMonth",
+  allDaySlot: false,
   dayMaxEventRows: true,
   dayCellDidMount: async function (info) {
     // const holidays = await fetchHolidays();
