@@ -151,7 +151,7 @@
   max-width: min(90vw, 450px);
 
   background-color: white; /* 不透明な背景色 */
-  margin: 10% auto;
+  margin: 5% auto;
   padding: 20px;
   padding-bottom: 10px;
   position: relative;
@@ -162,7 +162,7 @@
 #colorPopupInside {
   width: 100%;
   height: 100px;
-  max-width: 400px;
+  max-width: min(90vw, 400px);
 
   background: white;
   margin: 10% auto;
@@ -177,7 +177,7 @@
 .locationPopupInside {
   width: 100%;
   height: 240px;
-  max-width: 400px;
+  max-width: min(90vw, 400px);
 
   background: white;
   margin: 20% auto;
@@ -298,6 +298,7 @@
 .taskTitle {
   width: 90%;
   margin: 10px;
+  margin-top: 25px;
 }
 
 .inputContainer {
@@ -597,6 +598,15 @@
   }
   .nightWord {
     font-size: 14px;
+  }
+  .circles {
+    margin: 20px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-left: 20px;
+    margin-top: 5px;
+    justify-content: space-evenly;
   }
 }
 @media screen and (max-width: 1000px) {

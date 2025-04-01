@@ -284,7 +284,7 @@ document.getElementById("addTaskButton").addEventListener("click", () => {
   locationPopupInside.classList.add("locationPopupInside");
 
   const locationClose = document.createElement("div");
-  locationClose.textContent = "x";
+  locationClose.textContent = "×";
   locationClose.classList.add("locationClose");
 
   const locationInput = document.createElement("textarea");
