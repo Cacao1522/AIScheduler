@@ -14,7 +14,24 @@ const modalEnd = document.getElementById("modal-end");
 const modalDescription = document.getElementById("modal-description");
 const modalLocation = document.getElementById("modal-location");
 const modalClose = document.getElementById("modal-close");
+const loginButton = document.getElementById("loginButton");
+const logoutButton = document.getElementById("sign-out-button");
+loginButton.style.display = "block";
+logoutButton.style.display = "none";
 
+function updateLoginButtonText() {
+  if (window.innerWidth <= 1000) {
+    loginButton.textContent = "ログイン";
+  } else {
+    loginButton.textContent = "Googleカレンダーと連携（ログイン）";
+  }
+}
+
+// 初回実行
+updateLoginButtonText();
+
+// ウィンドウサイズ変更時に実行
+window.addEventListener("resize", updateLoginButtonText);
 modalClose.addEventListener("click", () => {
   modal.style.display = "none";
 });
@@ -33,15 +50,22 @@ modalClose.addEventListener("click", () => {
 //     modalPopupWrapper.style.display = "none";
 //   }
 // });
-
+let calendarDisplay = "timeGridDay,timeGridWeek";
+if (window.innerWidth <= 1000) {
+  calendarDisplay = "timeGridDay,dayGridMonth";
+}
 // 日表示のカレンダー
 var calendarDay = new Calendar(calendarDayEl, {
-  plugins: [timeGridPlugin, InteractionPlugin],
+  plugins: [dayGridPlugin, timeGridPlugin, InteractionPlugin],
   initialView: "timeGridDay",
   allDaySlot: false, // 終日スロットを非表示
   nowIndicator: true,
   //height: "auto", // 高さを自動調整
-
+  headerToolbar: {
+    start: calendarDisplay, // 月・週表示
+    center: "title",
+    end: "prev,next today", // 「前月を表示」、「次月を表示」、「今日を表示」
+  },
   eventClick: function (info) {
     modal.style.display = "block";
     modalTitle.textContent = info.event.title;
@@ -111,7 +135,9 @@ var calendarMonth = new Calendar(calendarMonthEl, {
 const BASE_URL = //"http://localhost:3000";
   "https://aischeduler-bqdagmcwh2g0bqfn.japaneast-01.azurewebsites.net";
 document.addEventListener("DOMContentLoaded", async function () {
-  calendarMonth.render();
+  if (window.innerWidth >= 1000) {
+    calendarMonth.render();
+  }
   calendarDay.render();
   const loginButton = document.getElementById("loginButton");
 
@@ -211,6 +237,8 @@ const colorMap = {
 export const googleCalendarData = [];
 // 🔹 Google カレンダーの予定を取得してカレンダーに追加
 async function fetchGoogleCalendarEvents() {
+  loginButton.style.display = "none";
+  logoutButton.style.display = "block";
   try {
     const response = await fetch(`${BASE_URL}/getGoogleCalendarEvents`, {
       method: "GET",
@@ -303,7 +331,9 @@ async function fetchGoogleCalendarEvents() {
         });
       });
     }
-    calendarMonth.render();
+    if (window.innerWidth >= 1000) {
+      calendarMonth.render();
+    }
   } catch (error) {
     console.error("❌ Google カレンダーの予定取得エラー:", error);
   }

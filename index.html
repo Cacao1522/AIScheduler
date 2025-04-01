@@ -17,7 +17,7 @@
     </div>
     <div id="popupWrapper">
       <div id="popupInside">
-        <div id="close" class="close">x</div>
+        <div id="close" class="close">×</div>
         <div id="inputContainer" class="inputContainer">
           <input
             type="text"
@@ -42,7 +42,7 @@
         <div id="taskDateDiscription" class="taskDateDiscription">タスクの期限を入力 *</div>
         <div id="optionContainer" class="optionContainer">
           <input type="datetime-local" id="taskDate" class="taskDate" required/>
-          <input type="number" id="taskTime" class="taskTime" placeholder="所要時間(分)を入力 *" required min="1"/>
+          <input type="number" id="taskTime" class="taskTime" placeholder="所要時間(分)を入力 *" required min="0" step="5"/>
           <div id="taskColor" class="taskColor">
             <div id="colorPopupWrapper">
               <div id="colorPopupInside">
@@ -120,16 +120,17 @@
         </div>
         <div id="taskContainer" class="inputContainer"></div>
         <input type="checkbox" id="nightTime" class="nightTime" checked/>
-        深夜の <input type="time" id="nightStart" class="nightStart" value="00:00"/>～
-        <input type="time" id="nightEnd" class="nightEnd" value="06:00"/> は作業しない
+        <span class="nightWord">深夜の <input type="time" id="nightStart" class="nightStart" value="00:00"/>～
+        <input type="time" id="nightEnd" class="nightEnd" value="06:00"/> は作業しない</span>
         <div id =addMake>
         <button id="addTaskButton" class="addTaskButton"><span class="material-icons">add</span> タスクを追加</button>
         <button id="Button" class="make">スケジュールを作成</button>
         </div>
+        <div id="message" class="message">　</div>
         <div id="ButtonContainer">
           <div id="ButtonPopupWrapper">
             <div id="ButtonPopupInside">
-              <div id="ButtonClose">x</div>
+              <div id="ButtonClose">×</div>
               <div id="ButtonPopupResult"></div>
               <div class="buttonContainer">
                 <button id="confirmButton" class="make">決定</button>
@@ -158,7 +159,7 @@
       <p id="modal-end"></p>
       <p id="modal-description"></p>
       <p id="modal-location"></p>
-      <div id="modal-close" class="close">x</div>
+      <div id="modal-close" class="close">×</div>
       </div>
     </div>
       </body>

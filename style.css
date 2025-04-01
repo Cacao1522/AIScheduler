@@ -61,9 +61,11 @@
 }
 #loginButton {
   margin-left: auto; /* 右端に配置 */
+  margin-right: 20px;
 }
 #sign-out-button {
-  margin: 0 20px;
+  margin-left: auto; /* 右端に配置 */
+  margin-right: 20px;
   width: 200px;
 }
 #buttonContainer {
@@ -146,11 +148,12 @@
 #popupInside {
   width: 100%;
   /* height: 550px; */
-  max-width: 450px;
+  max-width: min(90vw, 450px);
 
   background-color: white; /* 不透明な背景色 */
   margin: 10% auto;
   padding: 20px;
+  padding-bottom: 10px;
   position: relative;
   border-radius: 10px;
   z-index: 3000; /* ポップアップコンテンツのz-indexを設定 */
@@ -423,12 +426,27 @@
 
 /* カレンダーのサイズを調整 */
 #calendar-day {
-  width: 35%; /* 各カレンダーの幅を調整 */
+  width: 40%; /* 各カレンダーの幅を調整 */
 }
 #calendar-month{
   width: 55%;
 }
-
+@media screen and (max-width: 1000px) {
+  #calendar-day {
+    width: 100%; /* 各カレンダーの幅を調整 */
+  }
+  #calendar-month{
+    width: 0%;
+  }
+  #calendar-container {
+    gap: 0px; /* カレンダーの間のギャップ */
+    height: 100vh;
+    padding: 0 10px; 
+  }
+  .fc-toolbar-title {
+    font-size: 20px !important;
+  }
+}
 .task-form {
   text-align: left; /* テキストやインライン要素の左揃え */
 }
@@ -535,4 +553,55 @@
   height: 30px;
   margin: 10px 0 10px 20px;
   transform: scale(1.5);
+}
+.message {
+  text-align: center;
+}
+@media screen and (max-width: 600px) {
+  #buttonContainer {
+    align-items: center;
+  }
+  #clickBtn {
+    transform: none;
+    left: 20px;
+    max-width: 200px;
+    font-size: 18px;
+    height: 50px;
+  }
+  #loginButton, #sign-out-button {
+
+    padding: 10px 15px;
+    max-width: 100px;
+    height: 40px;
+    font-size: 12px;
+  }
+  #popupInside {
+    margin: 5% auto;
+    padding: 8px;
+  }
+  .taskDate {
+    margin-left: 10px;
+    width: 40%;
+  }
+  /* .inputContainer {
+    padding-right: 5px;;
+  } */
+  .taskTime, .taskColor, .locIcon{
+    margin-left: 15px;
+  }
+  .task-form {
+    width: 100%;
+  }
+  .nightTime {
+    margin-left: 5px;
+  }
+  .nightWord {
+    font-size: 14px;
+  }
+}
+@media screen and (max-width: 1000px) {
+  #loginButton, #sign-out-button {
+    max-width: 150px;
+
+  }
 }

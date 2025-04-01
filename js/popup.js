@@ -27,6 +27,17 @@ const nightStart = document.getElementById("nightStart");
 const nightEnd = document.getElementById("nightEnd");
 let taskCount = 1;
 let currentTaskColorDiv = null;
+const now = new Date();
+
+// 翌日0時に設定
+now.setDate(now.getDate() + 1);
+now.setHours(0, 0, 0, 0);
+const jstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+// YYYY-MM-DDTHH:MM 形式に変換
+const formattedDate = jstNow.toISOString().slice(0, 16);
+
+// 初期値としてセット
+taskDate.value = formattedDate;
 
 // ボタンをクリックしたときにポップアップを表示させる
 clickBtn.addEventListener("click", () => {
@@ -234,6 +245,7 @@ document.getElementById("addTaskButton").addEventListener("click", () => {
   taskDate.type = "datetime-local";
   taskDate.classList.add("taskDate");
   taskDate.required = true; // 必須項目
+  taskDate.value = formattedDate;
 
   // **時間**
   const taskTime = document.createElement("input");
@@ -241,7 +253,8 @@ document.getElementById("addTaskButton").addEventListener("click", () => {
   taskTime.placeholder = "所要時間(分)を入力 *";
   taskTime.classList.add("taskTime");
   taskTime.required = true; // 必須項目
-  taskTime.min = 1; // 最小値
+  taskTime.min = 0; // 最小値
+  taskTime.step = 5;
 
   // **色の選択**
   const taskColor = document.createElement("div");

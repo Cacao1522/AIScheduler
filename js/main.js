@@ -6,11 +6,14 @@ import { addEventToGoogleCalendar } from "./googleCalendar.js";
 const Button = document.getElementById("Button");
 const ButtonPopupWrapper = document.getElementById("ButtonPopupWrapper");
 const confirmButton = document.getElementById("confirmButton");
+const message = document.getElementById("message");
+const popupInside = document.getElementById("popupInside");
 let result;
 let finalResult;
 let taskInput;
 
 Button.addEventListener("click", async (event) => {
+  message.innerHTML = "スケジュール作成中...";
   taskInput = scheduleVariable();
   console.log(taskInput);
   console.log(googleCalendarData);
@@ -50,6 +53,7 @@ Button.addEventListener("click", async (event) => {
   // } catch (error) {
   //   console.error(error);
   // }
+  message.innerHTML = "";
 });
 
 // 最終的なデータの形を作る関数
@@ -67,6 +71,7 @@ function createfinalJSON() {
 
 // 決定ボタンを押したときに最終的なデータの形を作る
 confirmButton.addEventListener("click", async () => {
+  window.location.reload();
   finalResult = createfinalJSON(); // 関数を呼び出して情報を出力
 
   console.log(finalResult);
