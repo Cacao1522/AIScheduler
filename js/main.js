@@ -71,7 +71,9 @@ function createfinalJSON() {
 
 // 決定ボタンを押したときに最終的なデータの形を作る
 confirmButton.addEventListener("click", async () => {
-  window.location.reload();
+  if (window.innerWidth > 600) {
+    window.location.reload();
+  }
   finalResult = createfinalJSON(); // 関数を呼び出して情報を出力
 
   console.log(finalResult);
